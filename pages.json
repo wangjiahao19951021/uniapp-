@@ -1,0 +1,63 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"backgroundColor":"#FFFFFF",
+				"app-plus":{
+					"titleNView": {
+						"titleText":"直播",
+						"titleAlign":"left",
+						"buttons": [
+							{
+								"type":"menu"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/index/mt"
+		},
+		{
+			"path": "pages/live/live",
+			"style": {
+				"backgroundColor":"#8745FF",
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "直播",
+		"navigationBarBackgroundColor": "#8745FF",
+		"backgroundColor": "#8745FF"
+	},
+	"tabBar": {
+		"color": "#707070",
+		"selectedColor": "#8745FF",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "white",
+		"midButton": {
+			"iconPath": "static/shoucang.png",
+			"iconWidth":"60px",
+			"height":"60px"
+		},
+		"list": [{
+				"iconPath": "static/guanlian.png",
+				"selectedIconPath": "static/guanlian.png",
+				"pagePath": "pages/index/index",
+				"text": "发现"
+			},
+			{
+				"iconPath": "static/gerenshezhi.png",
+				"selectedIconPath": "static/gerenshezhi.png",
+				"pagePath": "pages/index/mt",
+				"text": "我的"
+			}
+		]
+	}
+}

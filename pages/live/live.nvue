@@ -1,0 +1,279 @@
+<!-- https://www.cnblogs.com/dch0/p/11933993.html 各个m3u8播放源-->
+<!-- http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8 -->
+<template>
+	<view class="page">
+	<!-- 	<video @error="error" src="http://39.135.138.60:18890/PLTV/88888910/224/3221225618/index.m3u8"
+			style="width: 100vw;" :style="{height : height + 'px'}" :autoplay="true" :controls="false"></video> -->
+			<video @error="error" src="http://39.135.138.60:18890/PLTV/88888910/224/3221225618/index.m3u8"
+				style="width: 100%; height: 100%; display: flex; flex: 1;" :autoplay="true" :controls="false"></video>
+				
+
+		<!-- 头部 -->
+		<view style="position: fixed; left: 0; right: 0; display: flex;" :style="'top: ' + statusBarHeight + 'px'">
+			<!-- 个人信息|滚看详细信息 -->
+			<view style="height: 80rpx; display: flex; justify-content: space-between; flex-direction:row;">
+				<view
+					style="width: 325rpx; display: flex; background-color: rgba(0, 0, 0, .2); border-radius: 20;justify-content: space-between; height: 80rpx; flex-direction: row; align-items: center; padding-left: 10; padding-right: 10;">
+					<view style="">
+						<image src="/static/imgs/user.jpg" style="width: 70rpx; height: 70rpx; border-radius: 100;">
+						</image>
+					</view>
+					<view style="flex: 1; padding-left: 10;">
+						<text style="color: #d3d3d3; font-size: 30rpx;">昵称</text>
+						<text style="color: #d3d3d3; font-size: 25rpx;">100</text>
+					</view>
+					<view
+						style="border-radius: 50; width: 70rpx; height: 70rpx; background-color: #ff0000; display: flex; align-items: center;">
+						<text style="color: #FFFFFF; font-size: 50rpx;">+</text>
+					</view>
+				</view>
+
+				<view
+					style="width: 425rpx; display: flex; background-color: rgba(0, 0, 0, .2); border-radius: 20;justify-content: space-between; height: 80rpx; flex-direction: row; align-items: center; padding-left: 10; padding-right: 10;">
+					<scroll-view scroll-x="true"
+						style="display: flex;  flex:1; width: 100%; white-space: nowrap;flex-direction: row;">
+						<view style="	display: inline-block;flex-direction: row; justify-content: space-between; "
+							v-for="i of 20">
+							<view style="padding-left: 10rpx; padding-right: 10rpx;">
+								<image :src="'/static/banner/OIP-C%20(' + Math.floor(Math.random()*6+1) + ').jpg'"
+									style="width: 70rpx; height: 70rpx; border-radius: 100;"></image>
+							</view>
+						</view>
+					</scroll-view>
+					<view
+						style="border-radius: 50; width: 70rpx; height: 70rpx; background-color: #ff0000; display: flex; align-items: center; flex-direction: row; justify-content: center;">
+						<text style="color: #FFFFFF; font-size: 26rpx; display: flex;align-items: center;">1000</text>
+					</view>
+				</view>
+
+			</view>
+			<!-- 金币 -->
+			<view style="height: 80rpx; margin-top: 10rpx;">
+				<view
+					style="width: 325rpx; display: flex; background-color: rgba(0, 0, 0, .2); border-radius: 20;justify-content: space-between; height: 80rpx; flex-direction: row; align-items: center; padding-left: 10; padding-right: 10;">
+					<!-- <view style="">
+						<image src="/static/icon/money.png" style="width: 50rpx; height: 50rpx; border-radius: 100;"></image>
+					</view> -->
+					<view style="flex: 1; padding-left: 10; display: flex; flex-direction: row; align-items: center;">
+						<text style="color: #FFFFFF; font-size: 30rpx; color: #ea9518;">金 币</text>
+						<text style="color: #d3d3d3; font-size: 25rpx; padding-left: 20;">100</text>
+					</view>
+				</view>
+			</view>
+			<!-- 收到礼物 -->
+			<!-- 礼物组件 -->
+			<gift ref="gift"></gift>
+		</view>
+
+		<!-- 弹幕 -->
+		<danmu ref="danmu"></danmu>
+
+		<!-- 底部 -->
+		<view
+			style="position: fixed; left: 0; bottom: 0; height: 120rpx;right: 0; display: flex; justify-content: space-between; align-items: center; flex-direction: row; padding-left: 10;">
+			<view>
+				<view class="btn" @click="openInput()">
+					<text style="font-size: 30rpx; color: #FFFFFF; padding-left: 20rpx; padding-right: 10; width: 500rpx;">说点什么...</text>
+				</view>
+			</view>
+			<view style="display: flex; align-items: center; flex-direction: row;">
+				<view class="btn" @click="figtPropup">
+					<image src="/static/live/good.png" class="btn-icon"></image>
+				</view>
+				<view class="btn" @click="back">
+					<image src="/static/live/fanhui2.png" class="btn-icon" style="background-color: #FFFFFF; border-radius: 100;"></image>
+				</view>
+			</view>
+		</view>
+		
+		<!-- 输入框弹窗 -->
+		<uni-popup ref="input" type="bottom">
+			<view style="display: flex; align-items: center; flex-direction: row; background-color: #ffffff; ">
+				<input type="text" v-model="danmuValue" style="padding-left: 20rpx;border: 1px solid #bcbcbc; width: 600rpx; height: 80rpx; font-size: 30rpx;" placeholder="说点什么...">
+				<view style="display: flex; justify-content: center; align-items: center; flex-direction: row;background: #8745FF; width: 150rpx; height: 80rpx;" @click="submitDanmu">
+					<text style="color: #FFFFFF; font-size: 30rpx;">发送</text>
+				</view>
+			</view>
+		</uni-popup>
+		
+		<!-- 送礼物弹出层 -->
+		<uni-popup type="bottom" ref="figtPropup">
+			<view style="background-color: #FFFFFF; width: 750rpx; height: 550rpx;">
+				<view style="height: 100rpx; display: flex; justify-content: space-between; align-items: center; flex-direction: row; padding-left: 30rpx; padding-right: 30rpx;">
+					<text style="font-size: 30rpx; color: #7c7c7c;">礼物</text>
+					<view @click="closeFigtPropup">
+						<image src="/static/icon/fanhui2.png" style="width: 30rpx; height: 30rpx;"></image>
+					</view>
+				</view>
+				<swiper :indicator-dots="true":duration="500" style="height: 350rpx; border-top: 1px solid #d5d5d5; border-bottom: 1px solid #d5d5d5;">
+					<swiper-item>
+						<view style="display: flex;flex-wrap: wrap; flex-direction: row;">
+							<view style="width: 187.5rpx; height: 175rpx; display: flex; justify-content: center; align-items: center; flex-direction: column;" v-for="(items, index) of giftList" :class="giftAction === items.id ? 'border border-main' : ''" @click="giftAction = items.id">
+								<image :src="items.url" style="width: 100rpx; height: 100rpx;"></image>
+								<view style="display: flex; flex-direction: row; align-items: center;">
+									<text style="color: #DD524D; font-size: 35rpx;">{{items.name}}</text>
+									<text style="color: #77fdff; font-size: 35rpx; padding-left: 10rpx;">{{items.id}}</text>
+								</view>
+							</view>
+							
+						</view>
+					</swiper-item>
+				</swiper>
+				<view style="height: 100rpx; display: flex; align-items: center; justify-content: flex-end; flex-direction: row; padding-right: 30rpx;">
+					<view style="display: flex; align-items: center; flex-direction: row;justify-content: center; border-radius: 20rpx; background: #8745FF; width: 150rpx; height: 60rpx;">
+						<text style="color: #FFFFFF; font-size: 30rpx;">充值</text>
+					</view>
+					<view style="display: flex; align-items: center; flex-direction: row;justify-content: center; border-radius: 20rpx; background: #ffaa00; width: 150rpx; height: 60rpx;margin-left: 30rpx;" @click="giftSend">
+						<text style="color: #FFFFFF; font-size: 30rpx;">发送</text>
+					</view>
+				</view>
+			</view>
+		</uni-popup>
+	</view>
+</template>
+
+<script>
+	import gift from "@/components/gift/gift.vue";
+	import uniPopup from "@/components/uni-popup/uni-popup.vue"
+	import danmu from "@/components/danmu/danmu.vue"
+	export default {
+		components: {
+			gift,
+			uniPopup,
+			danmu
+		},
+		data() {
+			return {
+				statusBarHeight: 0,
+				height: "",
+				width: "",
+				random: Math.floor(Math.random() * 6 + 1),
+				danmuValue: "",
+				giftList: [
+					{id: 1, url: "/static/gift/gift_1.png", name: "礼盒"},
+					{id: 2, url: "/static/gift/gift_2.png", name: "火箭"},
+					{id: 3, url: "/static/gift/gift_3.png", name: "666"},
+					{id: 4, url: "/static/gift/gift_4.png", name: "灯"},
+					{id: 5, url: "/static/gift/gift_5.png", name: "蛋糕"},
+					{id: 6, url: "/static/gift/gift_6.png", name: "冰淇淋"},
+					{id: 7, url: "/static/gift/gift_7.png", name: "游艇"},
+					{id: 8, url: "/static/gift/gift_8.png", name: "飞机"},
+				],
+				giftAction: 0
+			}
+		},
+		onLoad() {
+			let res = uni.getSystemInfoSync()
+			this.statusBarHeight = res.statusBarHeight
+			this.width = res.windowWidth;
+			this.height = res.windowHeight;
+		},
+		mounted() {
+			// 送礼物演示
+			// setInterval(() => {
+			// 	this.$refs.gift.send({
+			// 		username: "发送人",
+			// 		avant_img: "/static/banner/OIP-C%20(" + Math.floor(Math.random() * 6 + 1) + ").jpg",
+			// 		gift_name: "蛋糕",
+			// 		gift_image: "/static/gift/gift_" + Math.floor(Math.random() * 4 + 1) + ".png",
+			// 		num: Math.floor(Math.random() * 10 + 1),
+			// 	})
+			// }, 2000)
+			// 发送弹幕演示
+			// let id = 1
+			// setInterval(() => {
+			// 	this.$refs.danmu.send({
+			// 		id: id,
+			// 		username: "昵称" + id,
+			// 		text: "我是弹幕" + id
+			// 	});
+			// 	id ++
+			// }, 1000)
+		},
+		methods: {
+			back () {
+				uni.navigateBack()
+			},
+			openInput () {
+				this.$refs.input.open();
+			},
+			// 发送弹幕
+			submitDanmu () {
+				if (this.danmuValue == "" ) {
+					uni.showToast({
+						icon: "none",
+						title: "弹幕太短了!"
+					})
+					return 
+				} 
+				let id = parseInt(Math.random() * 100)
+				this.$refs.danmu.send({
+					id: id, 
+					username: "昵称" + id,
+					text: this.danmuValue
+				});
+				this.$refs.input.close()
+				// 清空弹幕
+				this.danmuValue = ""
+			},
+			// 打开送礼物弹出层
+			figtPropup () {
+				this.$refs.figtPropup.open()
+			},
+			// 关闭送礼物弹出层
+			closeFigtPropup () {
+				this.$refs.figtPropup.close()
+			},
+			// 选择礼物
+			giftSend () {
+				if (this.giftAction == 0) {
+					uni.showToast({
+						icon: "none",
+						title: "请选择要发送的礼物哦"
+					})
+					return
+				}
+				this.$refs.gift.send({
+					username: "发送人" + parseInt(Math.random() * 100),
+					gift_image: this.giftList[this.giftAction-1].url,
+					gift_name: this.giftList[this.giftAction-1].name,
+					avant_img: "/static/banner/OIP-C (" + Math.floor(Math.random() * 6 + 1) + ").jpg",
+					num: Math.floor(Math.random() * 10 + 1),
+				})
+				this.$refs.figtPropup.close()
+			}
+			
+		}
+	}
+</script>
+
+<style>
+	.page {
+		flex: 1;
+		background-color: black;
+	}
+
+	.icon {
+		font-size: 40rpx;
+		color: #ffff00;
+		font-family: iconfont;
+	}
+
+	.btn {
+		height: 80rpx;
+		border-radius: 100rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: row;
+		background-color: rgba(255, 255, 255, 0.12);
+	}
+	.btn-icon{
+		width: 80rpx; 
+		height: 80rpx;
+		margin-right: 20rpx;
+	}
+	.border-main{
+		background: #ebebeb;
+	}
+</style>
