@@ -67,18 +67,23 @@
 
 		<!-- 弹幕 -->
 		<danmu ref="danmu"></danmu>
+		<danmus ref="danmus" v-if="danmuFlag"></danmus>
 
 		<!-- 底部 -->
 		<view
 			style="position: fixed; left: 0; bottom: 0; height: 120rpx;right: 0; display: flex; justify-content: space-between; align-items: center; flex-direction: row; padding-left: 10;">
 			<view>
 				<view class="btn" @click="openInput()">
-					<text style="font-size: 30rpx; color: #FFFFFF; padding-left: 20rpx; padding-right: 10; width: 500rpx;">说点什么...</text>
+					<text style="font-size: 30rpx; color: #FFFFFF; padding-left: 20rpx; padding-right: 10; width: 400rpx;">说点什么...</text>
 				</view>
 			</view>
 			<view style="display: flex; align-items: center; flex-direction: row;">
 				<view class="btn" @click="figtPropup">
 					<image src="/static/live/good.png" class="btn-icon"></image>
+				</view>
+				<view class="btn"  @click="danmuFlags">
+					<image src="/static/live/jilu.png" class="btn-icon" v-if="danmuFlag"></image>
+					<image src="/static/live/jiluclose.png" class="btn-icon" v-else></image>
 				</view>
 				<view class="btn" @click="back">
 					<image src="/static/live/fanhui2.png" class="btn-icon" style="background-color: #FFFFFF; border-radius: 100;"></image>
@@ -136,11 +141,13 @@
 	import gift from "@/components/gift/gift.vue";
 	import uniPopup from "@/components/uni-popup/uni-popup.vue"
 	import danmu from "@/components/danmu/danmu.vue"
+	import danmus from "@/components/danmus/danmu.vue"
 	export default {
 		components: {
 			gift,
 			uniPopup,
-			danmu
+			danmu,
+			danmus
 		},
 		data() {
 			return {
@@ -159,7 +166,9 @@
 					{id: 7, url: "/static/gift/gift_7.png", name: "游艇"},
 					{id: 8, url: "/static/gift/gift_8.png", name: "飞机"},
 				],
-				giftAction: 0
+				giftAction: 0,
+				danmuFlag: false,
+				danmuList: []
 			}
 		},
 		onLoad() {
@@ -212,9 +221,35 @@
 					username: "昵称" + id,
 					text: this.danmuValue
 				});
+				this.danmuList.push({
+					id: id, 
+					username: "昵称" + id,
+					text: this.danmuValue
+				})
+				if (this.danmuFlag) {
+					this.$refs.danmus.send(this.danmuList);
+				}
 				this.$refs.input.close()
 				// 清空弹幕
 				this.danmuValue = ""
+			},
+			// 弹幕记录
+			danmuFlags () {
+				if (this.danmuFlag == false) {
+					if (this.danmuList.length == 0 ) {
+						uni.showToast({
+							icon: "none",
+							title: "还没有弹幕!"
+						})
+						return 
+					} 
+					this.danmuFlag = true
+					setTimeout(() => {
+						this.$refs.danmus.send(this.danmuList);
+					}, 100)
+				} else {
+					this.danmuFlag = false
+				}
 			},
 			// 打开送礼物弹出层
 			figtPropup () {
